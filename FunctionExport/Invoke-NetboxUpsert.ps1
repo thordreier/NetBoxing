@@ -55,8 +55,15 @@ function Invoke-NetboxUpsert
             $queryData = [System.Web.HttpUtility]::ParseQueryString([String]::Empty)
             foreach ($f in $Findby)
             {
+                $key = $f -replace '\.','_'
+                if (($a, $b = $f -split '=') -and $b) {
+                    $f   = $b
+                    $key = $a
+                }
+
                 # Is it insecure? Yes! Is it quick and dirty? Yes! Does it do the job? Yes!
-                $queryData.Add(($f -replace '\.','_'), (.([scriptblock]::Create("`$Properties.$f"))))
+                $val = .([scriptblock]::Create("`$Properties.$f"))
+                $queryData.Add($key, $val)
             }
             $findUri = '{0}?{1}' -f $uri, $queryData.ToString()
 
