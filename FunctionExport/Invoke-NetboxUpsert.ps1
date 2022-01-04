@@ -92,14 +92,15 @@ function Invoke-NetboxUpsert
             }
             else
             {
+                $body = ChangesOnly -Orig @{} -Changes ($Properties + $PropertiesNew)
                 if ($NoCreate)
                 {
                     Write-Warning -Message "Not creating $Uri"
-                    Write-Warning -Message (($Properties + $PropertiesNew) | ConvertTo-Json -Depth 9)
+                    Write-Warning -Message ($body | ConvertTo-Json -Depth 9)
                 }
                 else
                 {
-                    Invoke-NetboxRequest -Uri $Uri -Method Post -FullResponse -Body ($Properties + $PropertiesNew)
+                    Invoke-NetboxRequest -Uri $Uri -Method Post -FullResponse -Body $body
                 }
             }
         }
