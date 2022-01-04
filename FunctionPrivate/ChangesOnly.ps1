@@ -1,7 +1,13 @@
 function ChangesOnly ([PSObject] $Orig, [hashtable] $Changes)
 {
+    $expand = $null
     @($Changes.Keys) | ForEach-Object -Process {
-        if ($Changes.$_ -is [hashtable])
+        if ($_ -ceq '___EXPAND')
+        {
+            $expand = $Changes.$_
+            $null = $Changes.Remove($_)
+        }
+        elseif ($Changes.$_ -is [hashtable])
         {
             if (-not ($Changes.$_ = ChangesOnly -Orig $Orig.$_ -Changes $Changes.$_).Count)
             {
@@ -16,5 +22,12 @@ function ChangesOnly ([PSObject] $Orig, [hashtable] $Changes)
             }
         }
     }
-    $Changes
+    if ($expand)
+    {
+        $Changes.$expand
+    }
+    else
+    {
+        $Changes
+    }
 }
