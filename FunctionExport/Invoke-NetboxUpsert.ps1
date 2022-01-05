@@ -29,6 +29,10 @@ function Invoke-NetboxUpsert
         
         [Parameter()]
         [switch]
+        $Multi,
+
+        [Parameter()]
+        [switch]
         $NoCreate,
         
         [Parameter()]
@@ -52,30 +56,32 @@ function Invoke-NetboxUpsert
             # Make sure that we don't continue on error, and that we catches the error
             $ErrorActionPreference = 'Stop'
 
-            if ($item = @(Find-NetboxObject -Uri $Uri -Properties $Properties -FindBy $FindBy))
+            if ($items = @(Find-NetboxObject -Uri $Uri -Properties $Properties -FindBy $FindBy))
             {
-                if ($item.Count -eq 1)
+                if ($items.Count -eq 1 -or $Multi)
                 {
-                    $item = $item[0]
-                    if (-not ($itemUri = $item.url))
+                    foreach ($item in $items)
                     {
-                        $itemUri = '{0}{1}/' -f $Uri, $item.id
-                    }
-                    if ($updatedItem = Invoke-NetboxPatch -Uri $itemUri -Orig $item -Changes $Properties -NoUpdate:$NoUpdate)
-                    {
-                        $updatedItem
-                    }
-                    else
-                    {
-                        $item
+                        if (-not ($itemUri = $item.url))
+                        {
+                            $itemUri = '{0}{1}/' -f $Uri, $item.id
+                        }
+                        if ($updatedItem = Invoke-NetboxPatch -Uri $itemUri -Orig $item -Changes $Properties -NoUpdate:$NoUpdate)
+                        {
+                            $updatedItem
+                        }
+                        else
+                        {
+                            $item
+                        }
                     }
                 }
                 else
                 {
-                    throw "$($findUri) matched more than one item - matched $($item.Count)"
+                    throw "$($findUri) matched more than one item - matched $($items.Count)"
                 }
             }
-            else
+            elseif (-not $Multi)
             {
                 $body = ChangesOnly -Orig @{} -Changes ($Properties + $PropertiesNew)
                 if ($NoCreate)
@@ -87,6 +93,10 @@ function Invoke-NetboxUpsert
                 {
                     Invoke-NetboxRequest -Uri $Uri -Method Post -FullResponse -Body $body
                 }
+            }
+            else
+            {
+                Write-Verbose -Message 'Multi=true, but zero objects found'
             }
         }
         catch

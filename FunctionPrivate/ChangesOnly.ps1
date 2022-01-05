@@ -1,6 +1,7 @@
 function ChangesOnly ([PSObject] $Orig, [hashtable] $Changes)
 {
     $expand = $null
+    $Changes = $Changes.Clone()
     @($Changes.Keys) | ForEach-Object -Process {
         if ($_ -ceq '___EXPAND')
         {

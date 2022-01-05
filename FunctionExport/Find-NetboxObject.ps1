@@ -40,6 +40,7 @@ function Find-NetboxObject
             # Make sure that we don't continue on error, and that we catches the error
             $ErrorActionPreference = 'Stop'
 
+            $queryProperties = @{}
             $queryData = [System.Web.HttpUtility]::ParseQueryString([String]::Empty)
             foreach ($f in $Findby)
             {
@@ -51,12 +52,15 @@ function Find-NetboxObject
 
                 # Is it insecure? Yes! Is it quick and dirty? Yes! Does it do the job? Yes!
                 $val = .([scriptblock]::Create("`$Properties.$f"))
+                AddToHash -Hash $queryProperties -Key ($f -split '\.') -Value $val
                 $queryData.Add($key, $val)
             }
             $findUri = '{0}?{1}' -f $uri, $queryData.ToString()
 
-            # Return
-            Invoke-NetboxRequest -Uri $findUri
+            # Return (sometimes we risk getting more data back from Netbox than we wanted - that's why we also check locally)
+            Invoke-NetboxRequest -Uri $findUri -Follow | Where-Object -FilterScript {
+                -not (ChangesOnly -Orig $_ -Changes $queryProperties).Count
+            }
         }
         catch
         {
