@@ -4,7 +4,7 @@ function AddToHash ([hashtable] $Hash, [string[]] $Key, $Value)
     if ($Key)
     {
         if ($Hash[$K] -isnot [hashtable]) {$Hash[$K] = @{}}
-        Hash -Hash $Hash[$K] -Key $Key -Value $Value
+        AddToHash -Hash $Hash[$K] -Key $Key -Value $Value
     }
     else
     {
