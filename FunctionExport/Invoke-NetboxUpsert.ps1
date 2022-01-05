@@ -52,22 +52,7 @@ function Invoke-NetboxUpsert
             # Make sure that we don't continue on error, and that we catches the error
             $ErrorActionPreference = 'Stop'
 
-            $queryData = [System.Web.HttpUtility]::ParseQueryString([String]::Empty)
-            foreach ($f in $Findby)
-            {
-                $key = $f -replace '^custom_fields.','cf.' -replace '\.','_'
-                if (($a, $b = $f -split '=') -and $b) {
-                    $f   = $b
-                    $key = $a
-                }
-
-                # Is it insecure? Yes! Is it quick and dirty? Yes! Does it do the job? Yes!
-                $val = .([scriptblock]::Create("`$Properties.$f"))
-                $queryData.Add($key, $val)
-            }
-            $findUri = '{0}?{1}' -f $uri, $queryData.ToString()
-
-            if ($item = @(Invoke-NetboxRequest -Uri $findUri))
+            if ($item = @(Find-NetboxObject -Uri $Uri -Properties $Properties -FindBy $FindBy))
             {
                 if ($item.Count -eq 1)
                 {
