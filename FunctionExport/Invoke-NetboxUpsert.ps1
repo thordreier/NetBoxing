@@ -55,7 +55,7 @@ function Invoke-NetboxUpsert
             $queryData = [System.Web.HttpUtility]::ParseQueryString([String]::Empty)
             foreach ($f in $Findby)
             {
-                $key = $f -replace '\.','_'
+                $key = $f -replace '^custom_fields.','cf.' -replace '\.','_'
                 if (($a, $b = $f -split '=') -and $b) {
                     $f   = $b
                     $key = $a
