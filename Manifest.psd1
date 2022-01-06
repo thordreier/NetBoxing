@@ -16,7 +16,7 @@ GUID = '7604e892-81fc-46eb-b7be-d344dcbc3f10'
 Author = 'Thor Dreier'
 
 # Company or vendor of this module
-CompanyName = 'Someone'
+CompanyName = 'Thor Dreier'
 
 # Copyright statement for this module
 Copyright = 'MIT License'
@@ -90,10 +90,10 @@ PrivateData = @{
         # Tags = @()
 
         # A URL to the license for this module.
-        # LicenseUri = ''
+        LicenseUri = 'https://opensource.org/licenses/MIT'
 
         # A URL to the main website for this project.
-        # ProjectUri = ''
+        ProjectUri = 'https://github.com/thordreier/NetBoxing'
 
         # A URL to an icon representing this module.
         # IconUri = ''
@@ -112,7 +112,7 @@ PrivateData = @{
 
     } # End of PSData hashtable
 
-} # End of PrivateData hashtable
+ } # End of PrivateData hashtable
 
 # HelpInfo URI of this module
 # HelpInfoURI = ''
