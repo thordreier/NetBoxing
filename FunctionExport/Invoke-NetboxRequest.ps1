@@ -2,10 +2,38 @@ function Invoke-NetboxRequest
 {
     <#
         .SYNOPSIS
-            xxx
+            Send HTTP request to NetBox
 
         .DESCRIPTION
-            xxx
+            Send HTTP request to NetBox
+
+        .PARAMETER Uri
+            Either API part ("dcim/sites/") or full URI ("https://netbox.yourdomain.tld/api/dcim/sites/")
+
+        .PARAMETER Method
+            HTTP method
+            Get, Post, ...
+
+        .PARAMETER Body
+            Object (or hashtable) that should be sent if Method is POST or PATCH
+
+        .PARAMETER FullResponse
+            Return the full object returned from Netbox - and not only the "relevant" part
+
+        .PARAMETER Follow
+            If result from NetBox contains more than 50 objects, then follow next-page links and get it all
+
+        .EXAMPLE
+            Invoke-NetboxRequest dcim/sites/ -Follow
+            Fetch all sites from NetBox
+
+        .EXAMPLE
+            Invoke-NetboxRequest -Uri https://netbox.yourdomain.tld/api/dcim/sites/1/
+            Fetch site with ID 1 from Netbox
+
+        .EXAMPLE
+            Invoke-NetboxRequest -Uri tenancy/tenants/ -Method Post -Body @{name='Example Tenant'; slug='example-tenant'}
+            Create new tenant
     #>
 
     [CmdletBinding()]
@@ -70,7 +98,7 @@ function Invoke-NetboxRequest
             }
             if ($PSBoundParameters['Uri'] -notmatch '^http(s)?://')
             {
-                $PSBoundParameters['Uri'] = "$($script:baseUri)/api/$($PSBoundParameters['Uri'])"
+                $PSBoundParameters['Uri'] = "$($script:baseUri)/api/$($PSBoundParameters['Uri'] -replace '^/')"
             }
 
             do
@@ -94,8 +122,12 @@ function Invoke-NetboxRequest
         }
         catch
         {
-            Write-Verbose -Message "Encountered an error: $_"
-            Write-Error -ErrorAction $origErrorActionPreference -Exception $_.Exception
+            # If error was encountered inside this function then stop doing more
+            # But still respect the ErrorAction that comes when calling this function
+            # And also return the line number where the original error occured
+            $msg = $_.ToString() + "`r`n" + $_.InvocationInfo.PositionMessage.ToString()
+            Write-Verbose -Message "Encountered an error: $msg"
+            Write-Error -ErrorAction $origErrorActionPreference -Exception $_.Exception -Message $msg
         }
         finally
         {

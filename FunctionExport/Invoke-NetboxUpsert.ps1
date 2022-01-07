@@ -2,10 +2,43 @@ function Invoke-NetboxUpsert
 {
     <#
         .SYNOPSIS
-            xxx
+            Update (patch) or create NetBox object
 
         .DESCRIPTION
-            xxx
+            Update (patch) or create NetBox object
+            If existing object is found
+
+        .PARAMETER Uri
+            Either API part ("dcim/sites/") or full URI ("https://netbox.yourdomain.tld/api/dcim/sites/")
+
+        .PARAMETER Properties
+            Properties that should be set when updating or creating object
+
+        .PARAMETER PropertiesNew
+            Properties that should only be set when creating object - not when updating
+
+        .PARAMETER FindBy
+            Which properties should be used to find existing object
+
+        .PARAMETER Multi
+            Changes to multiple objects is allowed.
+            Normally only changes to one object is allowed.
+            If this is set, no new objects will be created, only existing will be updated.
+
+        .PARAMETER NoCreate
+            Don't create object, only show what would be sent to server (as a warning)
+
+        .PARAMETER NoUpdate
+            Don't update object, only show what would be sent to server (as a warning)
+
+        .EXAMPLE
+            Invoke-NetboxUpsert -Uri ipam/prefixes/ -FindBy 'prefix' -Properties @{prefix='10.0.0.0/30'; description='example'}
+            If prefix 10.0.0.0/30 already exist, then set description. If it doesn't exist, then create it.
+
+        .EXAMPLE
+            Invoke-NetboxUpsert -Uri ipam/prefixes/ -FindBy 'vlan.vid' -Properties @{vlan=@{vid=3999}; description='example'} -Multi -NoUpdate
+            Find all prefixes attached to VLAN 3999 and show which changes that should be made (as warning).
+            Remove -NoUpdate to send patch requests to NetBox
     #>
 
     [CmdletBinding()]

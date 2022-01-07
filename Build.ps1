@@ -1,8 +1,8 @@
 <#PSScriptInfo
-	.VERSION 0.1.20220103.115207
+	.VERSION 0.2
 	.GUID e0a6966d-65c7-4ed7-8f6c-417fb2d43c5f
 	.AUTHOR Thor Dreier
-	.COMPANYNAME Someone
+	.COMPANYNAME Thor Dreier
 	.COPYRIGHT This is free and unencumbered software released into the public domain
 	.TAGS
 	.LICENSEURI https://unlicense.org/
@@ -808,8 +808,10 @@ function Invoke-ModuleBuild
                 {
                     if ($InstallModule)
                     {
+                        $importModule = $false
                         if (@('AllUsers','CurrentUser') -contains $InstallModulePath)
                         {
+                            $importModule = $true
                             $InstallModulePath = JoinPath @(
                                 &{if ($InstallModulePath -eq 'AllUsers') {$env:ProgramFiles} else {[Environment]::GetFolderPath('MyDocuments')}}
                                 &{if ($PSVersionTable.ContainsKey('PSEdition') -and $PSVersionTable.PSEdition -eq 'Core') {'PowerShell'} else {'WindowsPowerShell'}}
@@ -821,6 +823,12 @@ function Invoke-ModuleBuild
                         Write-Verbose -Message "Installing module in $InstallModulePath"
                         $moduleInstallDir = CreateDirectory -Path $InstallModulePath
                         [System.IO.Compression.ZipFile]::ExtractToDirectory($variables.TargetZip.FullName, $moduleInstallDir.FullName)
+                        if ($importModule)
+                        {
+                            Write-Verbose -Message "Importing module $($variables.TargetName) version $($variables.Version)"
+                            Remove-Module -Name $variables.TargetName -ErrorAction SilentlyContinue -Force
+                            Import-Module -Name $variables.TargetName -RequiredVersion $variables.Version
+                        }
                     }
                 }
             }

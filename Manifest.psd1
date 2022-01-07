@@ -22,7 +22,7 @@ CompanyName = 'Thor Dreier'
 Copyright = 'MIT License'
 
 # Description of the functionality provided by this module
-# Description = ''
+Description = 'PowerShell functions to interact with NetBox API'
 
 # Minimum version of the Windows PowerShell engine required by this module
 # PowerShellVersion = ''
@@ -87,7 +87,7 @@ PrivateData = @{
     PSData = @{
 
         # Tags applied to this module. These help with module discovery in online galleries.
-        # Tags = @()
+        Tags = 'Netbox','IPAM','DCIM'
 
         # A URL to the license for this module.
         LicenseUri = 'https://opensource.org/licenses/MIT'

@@ -2,10 +2,38 @@ function Invoke-NetboxPatch
 {
     <#
         .SYNOPSIS
-            xxx
+            Patch object in Netbox
 
         .DESCRIPTION
-            xxx
+            Patch object in Netbox
+
+        .PARAMETER Uri
+            Either API part ("dcim/sites/") or full URI ("https://netbox.yourdomain.tld/api/dcim/sites/")
+
+        .PARAMETER Orig
+            Original unpatched object
+
+        .PARAMETER Changes
+            Hashtable with changes to be made to object
+
+        .PARAMETER NoUpdate
+            Don't update object, only show what would be sent to server (as a warning)
+
+        .PARAMETER Wait
+            After patch is sent to NetBox, wait with a "Press enter to continue" prompt
+
+        .EXAMPLE
+            Invoke-NetboxPatch -Uri tenancy/tenants/3/ -Changes @{description = 'example'}
+            Patch tenant 3 with description.
+            This is always sent to Netbox, even if description hasn't changes.
+            The function doesn't know the previous state of the properties.
+
+        .EXAMPLE
+            $v = Invoke-NetboxRequest ipam/vlans/1/ ; Invoke-NetboxPatch -Orig $v -Changes @{description = 'example'}
+            Fetch VLAN object with id 1 and change description.
+            If description is already correct, then a patch request isn't sent to Netbox.
+            Old versions of Netbox didn't have an "url" property in objects. If that's the case, then this should be added:
+             -Uri "ipam/vlans/$($v.id)/"
     #>
 
     [CmdletBinding()]
@@ -15,7 +43,7 @@ function Invoke-NetboxPatch
         [string]
         $Uri,
         
-        [Parameter(Mandatory = $true)]
+        [Parameter()]
         [PSObject]
         $Orig,
         
