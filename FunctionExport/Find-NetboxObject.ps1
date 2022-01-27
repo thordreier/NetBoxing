@@ -90,7 +90,7 @@ function Find-NetboxObject
             $cAll = $cReturned = 0
             Invoke-NetboxRequest -Uri $findUri -Follow | Where-Object -FilterScript {
                 ++$cAll
-                -not (ChangesOnly -Orig $_ -Changes $queryProperties).Count -and ++$cReturned
+                -not (ChangesOnly -Item $_ -Changes $queryProperties).Count -and ++$cReturned
             }
             Write-Verbose -Message "Got $cAll objects back from server and returned $cReturned"
         }

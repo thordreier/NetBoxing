@@ -109,7 +109,7 @@ function Invoke-NetboxUpsert
                             if (-not $itemObj.id) {throw 'No ID found on NetBox object'}
                             $itemUri = '{0}{1}/' -f $Uri, $itemObj.id
                         }
-                        if ($updatedItem = Invoke-NetboxPatch -Uri $itemUri -Orig $itemObj -Changes $Properties -NoUpdate:$NoUpdate)
+                        if ($updatedItem = Invoke-NetboxPatch -Uri $itemUri -Item $itemObj -Changes $Properties -NoUpdate:$NoUpdate)
                         {
                             $updatedItem
                         }
@@ -126,7 +126,7 @@ function Invoke-NetboxUpsert
             }
             elseif (-not $Multi)
             {
-                $body = ChangesOnly -Orig @{} -Changes ($Properties + $PropertiesNew)
+                $body = ChangesOnly -Item @{} -Changes ($Properties + $PropertiesNew)
                 if ($NoCreate)
                 {
                     Write-Warning -Message "Not creating $Uri"

@@ -75,7 +75,7 @@ SYNOPSIS
     
     
 SYNTAX
-    Find-NetboxObject [-Uri] <String> [-Properties] <Hashtable> [[-FindBy] <Array>] [<CommonParameters>]
+    Find-NetboxObject [-Uri] <String> [-Properties] <Hashtable> [[-FindBy] <String[]>] [<CommonParameters>]
     
     
 DESCRIPTION
@@ -89,7 +89,7 @@ PARAMETERS
     -Properties <Hashtable>
         Hashtable with properties
         
-    -FindBy <Array>
+    -FindBy <String[]>
         Which properties should be used to find object
         
     <CommonParameters>
@@ -294,7 +294,7 @@ SYNOPSIS
     
     
 SYNTAX
-    Invoke-NetboxUpsert [-Uri] <String> [-Properties] <Hashtable> [[-PropertiesNew] <Hashtable>] [-FindBy] <Array> [-Multi] [-NoCreate] [-NoUpdate] [<CommonParameters>]
+    Invoke-NetboxUpsert [-Uri] <String> [-Properties] <Hashtable> [[-PropertiesNew] <Hashtable>] [-FindBy] <String[]> [[-Item] <PSObject[]>] [-Multi] [-NoCreate] [-NoUpdate] [<CommonParameters>]
     
     
 DESCRIPTION
@@ -312,8 +312,11 @@ PARAMETERS
     -PropertiesNew <Hashtable>
         Properties that should only be set when creating object - not when updating
         
-    -FindBy <Array>
+    -FindBy <String[]>
         Which properties should be used to find existing object
+        
+    -Item <PSObject[]>
+        Existing NetBox object can be passed (normally not used).
         
     -Multi [<SwitchParameter>]
         Changes to multiple objects is allowed.

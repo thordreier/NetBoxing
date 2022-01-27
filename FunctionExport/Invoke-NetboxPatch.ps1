@@ -10,7 +10,7 @@ function Invoke-NetboxPatch
         .PARAMETER Uri
             Either API part ("dcim/sites/") or full URI ("https://netbox.yourdomain.tld/api/dcim/sites/")
 
-        .PARAMETER Orig
+        .PARAMETER Item
             Original unpatched object
 
         .PARAMETER Changes
@@ -29,7 +29,7 @@ function Invoke-NetboxPatch
             The function doesn't know the previous state of the properties.
 
         .EXAMPLE
-            $v = Invoke-NetboxRequest ipam/vlans/1/ ; Invoke-NetboxPatch -Orig $v -Changes @{description = 'example'}
+            $v = Invoke-NetboxRequest ipam/vlans/1/ ; Invoke-NetboxPatch -Item $v -Changes @{description = 'example'}
             Fetch VLAN object with id 1 and change description.
             If description is already correct, then a patch request isn't sent to Netbox.
             Old versions of Netbox didn't have an "url" property in objects. If that's the case, then this should be added:
@@ -45,7 +45,7 @@ function Invoke-NetboxPatch
         
         [Parameter()]
         [PSObject]
-        $Orig,
+        $Item,
         
         [Parameter(Mandatory = $true)]
         [hashtable]
@@ -78,14 +78,14 @@ function Invoke-NetboxPatch
 
             if (-not $Uri)
             {
-                $Uri = $Orig.url
+                $Uri = $Item.url
             }
             if (-not $Uri)
             {
                 throw 'Cannot find URI for Netbox object'
             }
 
-            $body = ChangesOnly -Orig $Orig -Changes $Changes
+            $body = ChangesOnly -Item $Item -Changes $Changes
 
             if ($body.Count)
             {

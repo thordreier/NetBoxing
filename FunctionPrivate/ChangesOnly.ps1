@@ -1,9 +1,9 @@
-function ChangesOnly ([PSObject] $Orig, [hashtable] $Changes)
+function ChangesOnly ([PSObject] $Item, [hashtable] $Changes)
 {
-    function NotIdentical ($Orig, $Changes)
+    function NotIdentical ($Item, $Changes)
     {
-        ($Changes -is [hashtable] -and (ChangesOnly -Orig $Orig -Changes $Changes).Count) -or
-        ($Changes -isnot [hashtable] -and $Orig -cne $Changes)
+        ($Changes -is [hashtable] -and (ChangesOnly -Item $Item -Changes $Changes).Count) -or
+        ($Changes -isnot [hashtable] -and $Item -cne $Changes)
     }
 
     $expand = $null
@@ -17,7 +17,7 @@ function ChangesOnly ([PSObject] $Orig, [hashtable] $Changes)
         }
         elseif ($Changes.$key -is [hashtable])
         {
-            if (-not ($Changes.$key = ChangesOnly -Orig $Orig.$key -Changes $Changes.$key).Count)
+            if (-not ($Changes.$key = ChangesOnly -Item $Item.$key -Changes $Changes.$key).Count)
             {
                 $Changes.Remove($key)
             }
@@ -27,18 +27,18 @@ function ChangesOnly ([PSObject] $Orig, [hashtable] $Changes)
             if ($Changes.$key.Count -and $Changes.$key[0] -is [hashtable] -and $Changes.$key[0].___APPEND)
             {
                 $append, $Changes.$key = $Changes.$key
-                if (($ok = $Orig.$key) -isnot [array])
+                if (($ik = $Item.$key) -isnot [array])
                 {
-                    $ok = @()
+                    $ik = @()
                 }
                 $identical = $true
-                $combined = @($ok | Select-Object -Property $append.___APPEND)
+                $combined = @($ik | Select-Object -Property $append.___APPEND)
                 foreach ($c in $Changes.$key)
                 {
                     $exist = $false
-                    foreach ($o in $ok)
+                    foreach ($i in $ik)
                     {
-                        if (-not (NotIdentical -Orig $o -Changes $c))
+                        if (-not (NotIdentical -Item $i -Changes $c))
                         {
                             $exist = $true
                             break
@@ -61,12 +61,12 @@ function ChangesOnly ([PSObject] $Orig, [hashtable] $Changes)
             }
             else
             {
-                if ($Orig.$key -is [array] -and $Orig.$key.Count -eq $Changes.$key.Count)
+                if ($Item.$key -is [array] -and $Item.$key.Count -eq $Changes.$key.Count)
                 {
                     $identical = $true
                     for ($i=0; $i -lt $Changes.$key.Count; $i++)
                     {
-                        if (NotIdentical -Orig $Orig.$key[$i] -Changes $Changes.$key[$i])
+                        if (NotIdentical -Item $Item.$key[$i] -Changes $Changes.$key[$i])
                         {
                             $identical = $false
                             break
@@ -77,7 +77,7 @@ function ChangesOnly ([PSObject] $Orig, [hashtable] $Changes)
                         $Changes.Remove($key)
                     }
                 }
-                elseif ($Orig.$key -eq $null -and $Changes.$key.Count -eq 0)
+                elseif ($Item.$key -eq $null -and $Changes.$key.Count -eq 0)
                 {
                     $Changes.Remove($key)
                 }
@@ -85,7 +85,7 @@ function ChangesOnly ([PSObject] $Orig, [hashtable] $Changes)
         }
         else
         {
-            if ($Orig.$key -ceq $Changes.$key)
+            if ($Item.$key -ceq $Changes.$key)
             {
                 $null = $Changes.Remove($key)
             }

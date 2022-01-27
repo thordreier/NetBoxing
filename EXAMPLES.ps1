@@ -50,7 +50,7 @@ Invoke-NetboxPatch -Uri tenancy/tenants/3/ -Changes @{description = 'example'}
 # Old versions of Netbox didn't have an "url" property in objects. If that's the case, then this should be added:
 # -Uri "ipam/vlans/$($v.id)/"
 $v = Invoke-NetboxRequest ipam/vlans/1/
-Invoke-NetboxPatch -Orig $v -Changes @{description = 'example'}
+Invoke-NetboxPatch -Item $v -Changes @{description = 'example'}
 
 
 
