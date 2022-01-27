@@ -44,7 +44,7 @@ function Find-NetboxObject
         $Properties,
         
         [Parameter()]
-        [array]
+        [string[]]
         $FindBy
     )
 

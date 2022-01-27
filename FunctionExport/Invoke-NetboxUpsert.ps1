@@ -20,6 +20,9 @@ function Invoke-NetboxUpsert
         .PARAMETER FindBy
             Which properties should be used to find existing object
 
+        .PARAMETER Item
+            Existing NetBox object can be passed (normally not used).
+
         .PARAMETER Multi
             Changes to multiple objects is allowed.
             Normally only changes to one object is allowed.
@@ -57,8 +60,14 @@ function Invoke-NetboxUpsert
         $PropertiesNew = @{},
         
         [Parameter(Mandatory = $true)]
-        [array]
+        [string[]]
         $FindBy,
+
+        [Parameter()]
+        [AllowNull()]
+        [AllowEmptyCollection()]
+        [PSObject[]]
+        $Item,
         
         [Parameter()]
         [switch]
@@ -89,29 +98,30 @@ function Invoke-NetboxUpsert
             # Make sure that we don't continue on error, and that we catches the error
             $ErrorActionPreference = 'Stop'
 
-            if ($items = @(Find-NetboxObject -Uri $Uri -Properties $Properties -FindBy $FindBy))
+            if ($Item -or ($Item = @(Find-NetboxObject -Uri $Uri -Properties $Properties -FindBy $FindBy)))
             {
-                if ($items.Count -eq 1 -or $Multi)
+                if ($Item.Count -eq 1 -or $Multi)
                 {
-                    foreach ($item in $items)
+                    foreach ($itemObj in $Item)
                     {
-                        if (-not ($itemUri = $item.url))
+                        if (-not ($itemUri = $itemObj.url))
                         {
-                            $itemUri = '{0}{1}/' -f $Uri, $item.id
+                            if (-not $itemObj.id) {throw 'No ID found on NetBox object'}
+                            $itemUri = '{0}{1}/' -f $Uri, $itemObj.id
                         }
-                        if ($updatedItem = Invoke-NetboxPatch -Uri $itemUri -Orig $item -Changes $Properties -NoUpdate:$NoUpdate)
+                        if ($updatedItem = Invoke-NetboxPatch -Uri $itemUri -Orig $itemObj -Changes $Properties -NoUpdate:$NoUpdate)
                         {
                             $updatedItem
                         }
                         else
                         {
-                            $item
+                            $itemObj
                         }
                     }
                 }
                 else
                 {
-                    throw "$($findUri) matched more than one item - matched $($items.Count)"
+                    throw "$($findUri) matched more than one item - matched $($Item.Count)"
                 }
             }
             elseif (-not $Multi)
