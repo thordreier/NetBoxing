@@ -34,6 +34,9 @@ function Invoke-NetboxUpsert
         .PARAMETER NoUpdate
             Don't update object, only show what would be sent to server (as a warning)
 
+        .PARAMETER Wait
+            After post/patch is sent to NetBox, wait with a "Press enter to continue" prompt
+
         .EXAMPLE
             Invoke-NetboxUpsert -Uri ipam/prefixes/ -FindBy 'prefix' -Properties @{prefix='10.0.0.0/30'; description='example'}
             If prefix 10.0.0.0/30 already exist, then set description. If it doesn't exist, then create it.
@@ -79,7 +82,11 @@ function Invoke-NetboxUpsert
         
         [Parameter()]
         [switch]
-        $NoUpdate
+        $NoUpdate,
+
+        [Parameter()]
+        [switch]
+        $Wait
     )
 
     begin
@@ -109,7 +116,7 @@ function Invoke-NetboxUpsert
                             if (-not $itemObj.id) {throw 'No ID found on NetBox object'}
                             $itemUri = '{0}{1}/' -f $Uri, $itemObj.id
                         }
-                        if ($updatedItem = Invoke-NetboxPatch -Uri $itemUri -Item $itemObj -Changes $Properties -NoUpdate:$NoUpdate)
+                        if ($updatedItem = Invoke-NetboxPatch -Uri $itemUri -Item $itemObj -Changes $Properties -NoUpdate:$NoUpdate -Wait:$Wait)
                         {
                             $updatedItem
                         }
@@ -135,6 +142,10 @@ function Invoke-NetboxUpsert
                 else
                 {
                     Invoke-NetboxRequest -Uri $Uri -Method Post -FullResponse -Body $body
+                    if ($Wait)
+                    {
+                        Read-Host -Prompt 'Press enter to continue'
+                    }
                 }
             }
             else
