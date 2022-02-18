@@ -147,7 +147,7 @@ SYNOPSIS
     
     
 SYNTAX
-    Invoke-NetboxPatch [[-Uri] <String>] [[-Orig] <PSObject>] [-Changes] <Hashtable> [-NoUpdate] [-Wait] [<CommonParameters>]
+    Invoke-NetboxPatch [[-Uri] <String>] [[-Item] <PSObject>] [-Changes] <Hashtable> [-NoUpdate] [-Wait] [<CommonParameters>]
     
     
 DESCRIPTION
@@ -158,7 +158,7 @@ PARAMETERS
     -Uri <String>
         Either API part ("dcim/sites/") or full URI ("https://netbox.yourdomain.tld/api/dcim/sites/")
         
-    -Orig <PSObject>
+    -Item <PSObject>
         Original unpatched object
         
     -Changes <Hashtable>
@@ -189,7 +189,7 @@ PARAMETERS
     
     -------------------------- EXAMPLE 2 --------------------------
     
-    PS C:\>$v = Invoke-NetboxRequest ipam/vlans/1/ ; Invoke-NetboxPatch -Orig $v -Changes @{description = 'example'}
+    PS C:\>$v = Invoke-NetboxRequest ipam/vlans/1/ ; Invoke-NetboxPatch -Item $v -Changes @{description = 'example'}
     
     Fetch VLAN object with id 1 and change description.
     If description is already correct, then a patch request isn't sent to Netbox.
@@ -294,7 +294,7 @@ SYNOPSIS
     
     
 SYNTAX
-    Invoke-NetboxUpsert [-Uri] <String> [-Properties] <Hashtable> [[-PropertiesNew] <Hashtable>] [-FindBy] <String[]> [[-Item] <PSObject[]>] [-Multi] [-NoCreate] [-NoUpdate] [<CommonParameters>]
+    Invoke-NetboxUpsert [-Uri] <String> [-Properties] <Hashtable> [[-PropertiesNew] <Hashtable>] [-FindBy] <String[]> [[-Item] <PSObject[]>] [-Multi] [-NoCreate] [-NoUpdate] [-Wait] [<CommonParameters>]
     
     
 DESCRIPTION
@@ -328,6 +328,9 @@ PARAMETERS
         
     -NoUpdate [<SwitchParameter>]
         Don't update object, only show what would be sent to server (as a warning)
+        
+    -Wait [<SwitchParameter>]
+        After post/patch is sent to NetBox, wait with a "Press enter to continue" prompt
         
     <CommonParameters>
         This cmdlet supports the common parameters: Verbose, Debug,

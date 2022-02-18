@@ -22,7 +22,7 @@ CompanyName = 'Thor Dreier'
 Copyright = 'MIT License'
 
 # Description of the functionality provided by this module
-Description = 'PowerShell functions to interact with NetBox API'
+Description = 'Interact with NetBox API'
 
 # Minimum version of the Windows PowerShell engine required by this module
 # PowerShellVersion = ''
