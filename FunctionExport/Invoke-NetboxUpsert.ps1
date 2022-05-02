@@ -47,7 +47,7 @@ function Invoke-NetboxUpsert
             Remove -NoUpdate to send patch requests to NetBox
     #>
 
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName='Findby')]
     param
     (
         [Parameter(Mandatory = $true)]
@@ -62,13 +62,11 @@ function Invoke-NetboxUpsert
         [hashtable]
         $PropertiesNew = @{},
         
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true, ParameterSetName  = 'Findby')]
         [string[]]
         $FindBy,
 
-        [Parameter()]
-        [AllowNull()]
-        [AllowEmptyCollection()]
+        [Parameter(Mandatory = $true, ParameterSetName = 'Item')]
         [PSObject[]]
         $Item,
         
