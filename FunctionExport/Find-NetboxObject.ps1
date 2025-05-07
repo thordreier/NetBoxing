@@ -87,10 +87,12 @@ function Find-NetboxObject
             $findUri = '{0}?{1}' -f $uri, $queryData.ToString()
 
             # Return (sometimes we risk getting more data back from Netbox than we wanted - that's why we also check locally)
-            $cAll = $cReturned = 0
-            Invoke-NetboxRequest -Uri $findUri -Follow | Where-Object -FilterScript {
-                ++$cAll
-                -not (ChangesOnly -Item $_ -Changes $queryProperties).Count -and ++$cReturned
+            # If only one object is returned from Netbox, it is always returned
+            $all = @(Invoke-NetboxRequest -Uri $findUri -Follow)
+            $cAll = $all.Count
+            $cReturned = 0
+            $all | Where-Object -FilterScript {
+                (-not (ChangesOnly -Item $_ -Changes $queryProperties).Count -or $cAll -eq 1) -and ++$cReturned
             }
             Write-Verbose -Message "Got $cAll objects back from server and returned $cReturned"
         }
